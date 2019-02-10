@@ -1,0 +1,6 @@
+# virtualenv
+*.env/
+
+# кэш питона
+*pycache*/
+*.pyc
