@@ -4,4 +4,4 @@
 # кэш питона
 *pycache*/
 *.pyc
-.pytest_cache;
+.pytest_cache
