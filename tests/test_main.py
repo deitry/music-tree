@@ -4,6 +4,8 @@ from music_tree.base.note_node import NoteNode
 def test_00_basic_setup():
     assert 1 == 1
 
-def test_01_nodw_init():
+def test_01_node_init():
     node = NoteNode()
-    assert node.value == 0
+    raise NotImplementedError
+
+#TODO: запуск main должен выполнять CliParser.parse(argv) + Player.play(node)
