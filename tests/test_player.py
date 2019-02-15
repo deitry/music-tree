@@ -11,6 +11,6 @@ def test_01_play_node():
     node = Node()
     try:
         player.play(node)
+        assert player.stopped == False
     except:
         pytest.fail("player did not make it...")
-
