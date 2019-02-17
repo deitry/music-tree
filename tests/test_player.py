@@ -12,5 +12,6 @@ def test_01_play_node():
     try:
         player.play(node)
         assert player.stopped == False
+        # проверять количество вызовов SoundEngine на соответствие нотам
     except:
         pytest.fail("player did not make it...")
