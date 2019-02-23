@@ -5,6 +5,7 @@ from music_tree.node_factory import NodeFactory
 def test_00_setup():
     assert 1 == 1
 
+@pytest.mark.skip("Not implemented")
 @pytest.mark.parametrize(("nodeType", "input"),
 [
     # FIXME: что-то вроде енама вместо целочисленного типа

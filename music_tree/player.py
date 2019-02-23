@@ -1,9 +1,9 @@
 """ Принимает на вход ноду, раскрывает её и проигрывает содержимое """
 
-import math
 from pyaudio import PyAudio
 from datetime import datetime, timedelta
 
+from music_tree.instruments.sin_wave import SinWave
 
 class Player():
     def __init__(self, **kwargs):
@@ -14,6 +14,10 @@ class Player():
         self.bitrate = 16000
         self.p = PyAudio()
         self.stream = None
+
+        # TODO:
+        # self.instruments
+        self.sinWave = SinWave(self.bitrate)
 
     def play(self, node):
 
@@ -36,47 +40,30 @@ class Player():
         #         notes = instrument.getNotes(node, pos)
         #         instrument.play(notes)
 
-    # TODO: перенести в instrument
+    # TODO: rename to playNote
+    # FIXME: must be non-blockable
     def testPlay(self, note, noteLen):
 
         if self.stream == None:
             raise AssertionError("Must be called in context manager")
 
-        noteHz = 440 * pow(2., note / 12.)
+        waveData = self.sinWave.toBytes(note, noteLen)
 
-        FREQUENCY = noteHz
-        LENGTH = noteLen
-
-        NUMBEROFFRAMES = int(self.bitrate * LENGTH)
-
-        WAVEDATA = ''
-
-        MAX = 128  # по сути отвечает за громкость
-        MAX_2 = int(MAX / 2)
-
-        CENTER = MAX_2
-
-        # TODO: заранее вычислять базовый семпл? генератор?
-        for x in range(NUMBEROFFRAMES):
-            WAVEDATA += chr(
-                int(
-                    math.sin(x / ((self.bitrate / FREQUENCY) / math.pi)) *
-                    (MAX_2 - 1) + CENTER))
-
-        time = datetime.now()
-        delta = timedelta(seconds=noteLen)
+        # time = datetime.now()
+        # delta = timedelta(seconds=noteLen)
 
         # для отладки задержек
         # print("times: ", time, self.last, delta)
         # len(WAVEDATA) / BITRATE,
         # print("len: ",  time - self.last - delta)
 
-        self.last = time
-        # TODO: итеративная запись в поток
+        # self.last = time
+
+        # TODO: итеративная запись в поток - порциями получать и писать байты
         # TODO: несколько нот одновременно?
         if not self._testMode:
             print("stream.write")
-            self.stream.write(WAVEDATA)
+            self.stream.write(waveData)
 
     def __enter__(self):
         self.stream = self.p.open(

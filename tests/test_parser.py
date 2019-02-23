@@ -5,6 +5,7 @@ from music_tree.parser import Parser
 def test_00_setup():
     assert 1 == 1
 
+@pytest.mark.skip
 def test_01_parser_read_file():
     parser = Parser()
     try:
