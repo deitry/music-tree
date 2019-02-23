@@ -11,6 +11,7 @@ def test_00_setup():
 def test_01_play_node():
     """ Проверка на проигрывание базовой ноды """
     node = Tempo(60)
+
     # TODO: параметризовать, добавить экземпляр ноды каждого типа
 
     with Player() as player:
@@ -19,11 +20,13 @@ def test_01_play_node():
         # TODO: stopped станет актуальным, когда вызов плеера станет неблокирующим
         assert player.stopped == True
 
-
+# @pytest.mark.env("sound")
 @pytest.mark.sound
 def test_02_testPlay():
     try:
-        with Player() as pl:
+        testSound = False
+
+        with Player(test=not testSound) as pl:
             pl.testPlay(0, 0.2)
             pl.testPlay(15, 0.2)
             pl.testPlay(14, 0.2)

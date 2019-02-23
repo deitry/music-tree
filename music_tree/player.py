@@ -6,7 +6,8 @@ from datetime import datetime, timedelta
 
 
 class Player():
-    def __init__(self):
+    def __init__(self, **kwargs):
+        self._testMode = kwargs["test"] if "test" in kwargs else True
         self.stopped = True
         self.last = datetime.now()
 
@@ -73,8 +74,9 @@ class Player():
         self.last = time
         # TODO: итеративная запись в поток
         # TODO: несколько нот одновременно?
-        # TODO: возможность запускать плеер в режиме теста без фактической записи
-        self.stream.write(WAVEDATA)
+        if not self._testMode:
+            print("stream.write")
+            self.stream.write(WAVEDATA)
 
     def __enter__(self):
         self.stream = self.p.open(
