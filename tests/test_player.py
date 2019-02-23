@@ -33,22 +33,5 @@ def test_02_testPlay():
             pl.testPlay(13, 0.27)
             pl.testPlay(12, 0.27)
             pl.testPlay(0, 0.8)
-    except AttributeError:
-        print(1)
-
-        # player.testPlay(12, 1)
-        # player.testPlay(0, 1)
-        # player.testPlay(12, 1)
-        # player.testPlay(0, 1)
-        # player.testPlay(12, 1)
-        # player.testPlay(0, 1)
-
-
-        # player.testPlay(12, 0.125)
-        # player.testPlay(12, 0.125)
-        # player.testPlay(12, 0.125)
-        # player.testPlay(12, 0.125)
-        # player.testPlay(0, 0.125)
-        # player.testPlay(0, 0.125)
-        # player.testPlay(0, 0.125)
-        # player.testPlay(0, 0.125)
+    except BaseException:
+        print("Something goes wrong")

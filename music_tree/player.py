@@ -48,7 +48,7 @@ class Player():
 
         WAVEDATA = ''
 
-        MAX = 8
+        MAX = 128 # по сути отвечает за громкость
         MAX_2 = int(MAX / 2)
 
         CENTER = MAX_2
