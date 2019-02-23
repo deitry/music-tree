@@ -2,8 +2,8 @@
 
 # Алгоритм работы:
 # - в папке (с вложенными папками) держим файлы нод.
-# - - нода может содержать в себе конкретные ноты, 
-# - - а может включать другие ноды 
+# - - нода может содержать в себе конкретные ноты,
+# - - а может включать другие ноды
 # - создать можно командой
 # - - mut create node.mun
 # - - - mut - от MUsic Tree
@@ -15,6 +15,14 @@
 # - - Редактор тоже консольный?
 # - передаём одну из нод на вход в программу:
 # - - mut play node.mun
-# - 
 # - PROFIT !!
 
+from music_tree.cli_parser import CliParser
+from music_tree.player import Player
+
+def main(args):
+    parser = CliParser()
+    node = parser.make_node(args)
+
+    with Player() as player:
+        player.play(node)
