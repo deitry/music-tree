@@ -8,6 +8,13 @@ from music_tree.instruments.sin_wave import SinWave
 from music_tree.instruments.triangle_wave import TriangleWave
 from music_tree.instruments.square_wave import SquareWave
 
+
+# TODO: move to class or lambda
+def callback(in_data, frame_count, time_info, status):
+    data = wf.readframes(frame_count)
+    return (data, pyaudio.paContinue)
+
+
 class Player():
     def __init__(self, **kwargs):
         self._testMode = kwargs["test"] if "test" in kwargs else True
@@ -21,15 +28,40 @@ class Player():
         # TODO:
         # self.instruments
         self.waveGen = SinWave(self.bitrate)
-        #self.waveGen = SquareWave(self.bitrate)
-        #self.waveGen = TriangleWave(self.bitrate)
+        self.gens = []
+        self.gens[0] = SinWave(self.bitrate)
+        self.gens[1] = SinWave(self.bitrate)
+        self.gens[2] = SinWave(self.bitrate)
 
+    # NOTE: blockable, but works through non-blockable callback
     def play(self, node):
 
+        # start streams
+        # TODO: callback as lambda
+
+        for i in range(3):
+            self.streamPool[i] = self.p.open(
+                format=self.p.get_format_from_width(1),
+                channels=1,
+                rate=self.bitrate,
+                output=True,
+                stream_callback=lambda in_data, frame_count, time_info, status: print(frame_count)
+            )
+
+            self.streamPool[i].start_stream()
+
+
         notes = node.getNotes()
+        for i in range(len(notes)):
+            note, noteLen = notes[i]
+            self.gens[i].makeWave(note, noteLen)
+
         # TODO: ноты как объекты с положением
-        for note, noteLen in notes:
-            self.testPlay(note, noteLen)
+        #for note, noteLen in notes:
+            #self.testPlay(note, noteLen)
+
+        # terminate streams
+
 
         # TODO: на основе содержимого нод определяем список нужных инструментов
         # instruments = node.getInstruments()
@@ -47,6 +79,7 @@ class Player():
 
     # TODO: rename to playNote
     # FIXME: must be non-blockable
+    # NOTE: blockable
     def testPlay(self, note, noteLen):
 
         if self.stream == None:
@@ -76,10 +109,19 @@ class Player():
             format=self.p.get_format_from_width(1),
             channels=1,
             rate=self.bitrate,
-            output=True)
+            output=True,
+            stream_callback=callback)
+
+        self.stream.start_stream()
+
+        # TODO: ?
+        # while stream.is_active():
+        #     time.sleep(0.1)
+
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stream.stop_stream()
         self.stream.close()
         self.p.terminate()
+

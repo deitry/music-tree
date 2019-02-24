@@ -10,6 +10,7 @@ class Node():
 # все накидаю в единый файлик
 
 
+
 class Tempo():
     def __init__(self, tempo):
         self.tempo = float(tempo)
@@ -38,11 +39,16 @@ class TimeSignature():
 
 
 class Chord():
-    def __init__(self, description):
+    def __init__(self):
         self.baseNote = 0  # == A
         self.notes = [0, 3, 7]  # = 1+3+5 = minor
         # TODO: ChordBuilder ?
         # = ChordBuilder(description)
+
+    def getNotes(self):
+        return [(note, 1) for note in self.notes]
+
+
 
 
 class Rhythm():

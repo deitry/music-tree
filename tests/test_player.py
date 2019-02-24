@@ -49,3 +49,12 @@ def implPlay(needSound):
             pl.testPlay(0, 0.8)
     except BaseException:
         print("Something goes wrong")
+
+@pytest.mark.inProgress
+def test_04_nonBlockable():
+    player = Player()
+    node = Chord()
+
+    player.play(node)
+
+    assert player.isStopped

@@ -2,6 +2,8 @@
 
 import math
 
+# TODO: toBytes д.б. генераторами
+
 class SinWave():
 
     def __init__(self, bitrate):
@@ -33,3 +35,19 @@ class SinWave():
 
 
         return WAVEDATA
+
+    def makeWave(self, note, noteLen):
+        self.wave = self.toBytes(note, noteLen)
+
+    def yieldBytes(self, n):
+        cnt = 0
+        data = []
+
+        for i in range(len(self.wave)):
+
+            data += chr(self.wave[i])
+            cnt += 1
+            if cnt >= n:
+                res = data
+                data = []
+                yield res
