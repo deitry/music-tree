@@ -3,7 +3,10 @@
 from pyaudio import PyAudio
 from datetime import datetime, timedelta
 
+# TODO: configure instruments/__init__.py
 from music_tree.instruments.sin_wave import SinWave
+from music_tree.instruments.triangle_wave import TriangleWave
+from music_tree.instruments.square_wave import SquareWave
 
 class Player():
     def __init__(self, **kwargs):
@@ -17,7 +20,9 @@ class Player():
 
         # TODO:
         # self.instruments
-        self.sinWave = SinWave(self.bitrate)
+        self.waveGen = SinWave(self.bitrate)
+        #self.waveGen = SquareWave(self.bitrate)
+        #self.waveGen = TriangleWave(self.bitrate)
 
     def play(self, node):
 
@@ -47,7 +52,7 @@ class Player():
         if self.stream == None:
             raise AssertionError("Must be called in context manager")
 
-        waveData = self.sinWave.toBytes(note, noteLen)
+        waveData = self.waveGen.toBytes(note, noteLen)
 
         # time = datetime.now()
         # delta = timedelta(seconds=noteLen)
@@ -61,6 +66,7 @@ class Player():
 
         # TODO: итеративная запись в поток - порциями получать и писать байты
         # TODO: несколько нот одновременно?
+        # https://people.csail.mit.edu/hubert/pyaudio/docs/
         if not self._testMode:
             print("stream.write")
             self.stream.write(waveData)

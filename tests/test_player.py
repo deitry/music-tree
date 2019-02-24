@@ -20,11 +20,18 @@ def test_01_play_node():
         # TODO: stopped станет актуальным, когда вызов плеера станет неблокирующим
         assert player.stopped == True
 
-# @pytest.mark.env("sound")
 @pytest.mark.sound
 def test_02_testPlay():
+    implPlay(False)
+
+@pytest.mark.sound
+@pytest.mark.env("sound")
+def test_03_testPlayWithSound():
+    implPlay(True)
+
+def implPlay(needSound):
     try:
-        testSound = False
+        testSound = needSound
 
         with Player(test=not testSound) as pl:
             pl.testPlay(0, 0.2)
