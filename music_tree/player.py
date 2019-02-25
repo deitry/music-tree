@@ -1,7 +1,9 @@
 """ Принимает на вход ноду, раскрывает её и проигрывает содержимое """
 
+import pyaudio
 from pyaudio import PyAudio
 from datetime import datetime, timedelta
+import time
 
 # TODO: configure instruments/__init__.py
 from music_tree.instruments.sin_wave import SinWave
@@ -10,9 +12,9 @@ from music_tree.instruments.square_wave import SquareWave
 
 
 # TODO: move to class or lambda
-def callback(in_data, frame_count, time_info, status):
-    data = wf.readframes(frame_count)
-    return (data, pyaudio.paContinue)
+# def callback(in_data, frame_count, time_info, status):
+#     data = wf.readframes(frame_count)
+#     return (data, pyaudio.paContinue)
 
 
 class Player():
@@ -29,39 +31,65 @@ class Player():
         # self.instruments
         self.waveGen = SinWave(self.bitrate)
         self.gens = []
-        self.gens[0] = SinWave(self.bitrate)
-        self.gens[1] = SinWave(self.bitrate)
-        self.gens[2] = SinWave(self.bitrate)
+
+        for i in range(3):
+            self.gens.append(SinWave(self.bitrate))
 
     # NOTE: blockable, but works through non-blockable callback
     def play(self, node):
 
-        # start streams
-        # TODO: callback as lambda
+        self.streamPool = []
 
-        for i in range(3):
-            self.streamPool[i] = self.p.open(
-                format=self.p.get_format_from_width(1),
-                channels=1,
-                rate=self.bitrate,
-                output=True,
-                stream_callback=lambda in_data, frame_count, time_info, status: print(frame_count)
-            )
-
-            self.streamPool[i].start_stream()
-
-
+        # получаем ноты и "вставляем" в генераторы
+        # FIXME: выглядит хреново, генераторы не работают
         notes = node.getNotes()
         for i in range(len(notes)):
             note, noteLen = notes[i]
             self.gens[i].makeWave(note, noteLen)
+
+        # подготавливаем потоки
+        for i in range(3):
+            stream = self.p.open(
+                format=self.p.get_format_from_width(1),
+                channels=1,
+                rate=self.bitrate,
+                output=True,
+                stream_callback=self.gens[i].callback
+            )
+
+            stream.start_stream()
+            print(stream.is_active())
+
+            self.streamPool.append(stream)
+
+        cnt = 0
+        self.stopped = False
+
+        while not self.stopped:
+            stopped = True
+            for i in range(3):
+                if not self.streamPool[i].is_stopped():
+                    stopped = False
+                    break
+
+            self.stopped = stopped
+            time.sleep(0.1)
+            cnt += 1
+            # TODO: не выходит сам по себе
+            if cnt > 10:
+                break
 
         # TODO: ноты как объекты с положением
         #for note, noteLen in notes:
             #self.testPlay(note, noteLen)
 
         # terminate streams
+        for stream in self.streamPool:
+            stream.stop_stream()
+            stream.close()
 
+        # FIXME: call in destructor
+        self.p.terminate()
 
         # TODO: на основе содержимого нод определяем список нужных инструментов
         # instruments = node.getInstruments()
@@ -105,12 +133,12 @@ class Player():
             self.stream.write(waveData)
 
     def __enter__(self):
+        # used to play in blockable mode
         self.stream = self.p.open(
             format=self.p.get_format_from_width(1),
             channels=1,
             rate=self.bitrate,
-            output=True,
-            stream_callback=callback)
+            output=True)
 
         self.stream.start_stream()
 
@@ -124,4 +152,3 @@ class Player():
         self.stream.stop_stream()
         self.stream.close()
         self.p.terminate()
-

@@ -51,10 +51,11 @@ def implPlay(needSound):
         print("Something goes wrong")
 
 @pytest.mark.inProgress
+@pytest.mark.sound
 def test_04_nonBlockable():
     player = Player()
     node = Chord()
-
+    print("ok")
     player.play(node)
-
-    assert player.isStopped
+    print("good")
+    assert player.stopped
