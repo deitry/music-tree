@@ -1,45 +1,74 @@
 #!/usr/bin/env python3
-
 """ Парсер из командной строки.
 Чтобы упростить ввод, возьмём парсер, отдельный от чтения файла.
 """
 
 import argparse
 
-from music_tree.base.node import *
+# from music_tree.base.node import *
 
 
 class CliParser():
     def __init__(self):
+        # https://habr.com/ru/post/144416/
+
         self.parser = argparse.ArgumentParser(
             description='Parse music node arguments')
 
-        subparsers = self.parser.add_subparsers(help='subcommand')
-
-        parser_init = subparsers.add_parser("init")
-        parser_pool = subparsers.add_parser("pool")
-        parser_track = subparsers.add_parser("track")
-
-        parser_init.add_argument("tempo", help='Base tempo value')
-        parser_init.add_argument("name", help='Composition name')
-
-        self.parser.add_argument('name', action='store', help='calling name')
-
-        # TODO: позиционный аргумент - по сути, субпарсер
-        # https://habr.com/ru/post/144416/
         self.parser.add_argument(
-            '-t', action='store', dest='tempo', help='Tempo value')
+            '-v',
+            '--verbose',
+            dest='verbose',
+            action='count',
+            help='verbose output')
+        subparsers = self.parser.add_subparsers(
+            help='subcommand', dest='command')
 
-    # FIXME: отказ от чистых нод
-    def make_node(self, input):
-        args = self.parser.parse_args(input)
+        # по парсеру на каждую субкоманду
+        parserInit = subparsers.add_parser("init")  # инициализация композиции
+        parserPool = subparsers.add_parser("pool")  # субкоманды пула
+        parserLink = subparsers.add_parser(
+            "link")  # создать связь (слово-текст)
+        parserPlay = subparsers.add_parser("play")  # проиграть композицию
+        parserMarker = subparsers.add_parser("marker")  # управление маркерами
 
-        if args.tempo != None:
-            return Tempo(args.tempo)
+        # init
+        # FIXME: имя не нужно? брать у текущей папки?
+        # или разрешить несколько композиций в одной папке?
+        # У них может быть общий пул
+        parserInit.add_argument("name", help='Composition name')
+        parserInit.add_argument(
+            "tempo", nargs="?", type=int, help='Base tempo value', default=120)
 
-        return None
+        # pool
+        poolSubparsers = parserPool.add_subparsers(
+            help='pool subcommands', dest='pool_command')
 
-    def parseInput(self, input):
-        args = self.parser.parse_args(input)
+        # pool add
+        parserPoolAdd = poolSubparsers.add_parser("add")
+        poolAddSubparsers = parserPoolAdd.add_subparsers(
+            help="container type", dest='container_type')
+
+        parserPoolAddText = poolAddSubparsers.add_parser("text")
+        parserPoolAddWord = poolAddSubparsers.add_parser("word")
+
+        parserPoolAddText.add_argument('name')
+
+        parserPoolAddWord.add_argument('content')
+        parserPoolAddWord.add_argument('name')
+
+        # pool rm
+        parserPoolRm = poolSubparsers.add_parser("rm")
+
+        # pool play
+        parserPoolPlay = poolSubparsers.add_parser("play")
+
+        # link
+        # marker
+        # play
+
+    def parseInput(self, argv=None):
+        args = self.parser.parse_args(
+        ) if argv == None else self.parser.parse_args(argv)
 
         print(args)

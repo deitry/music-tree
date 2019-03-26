@@ -15,9 +15,6 @@ def test_word():
     word.symbols[2].accent = True
 
     text = Text()
-    # 1. Добавляем
-    text.addLink()
-
 
 def test_text():
     text = Text()
