@@ -17,12 +17,18 @@
 # - - mut play node.mun
 # - PROFIT !!
 
+from sys import argv
+
 from music_tree.cli_parser import CliParser
 from music_tree.player import Player
 
 def main(args):
     parser = CliParser()
-    node = parser.make_node(args)
 
-    with Player() as player:
-        player.play(node)
+    args = parser.parseInput(args)
+
+#     with Player() as player:
+#         player.play(node)
+
+if __name__ == '__main__':
+    main(argv)
