@@ -64,11 +64,21 @@ class CliParser():
         parserPoolPlay = poolSubparsers.add_parser("play")
 
         # link
+        parserLink.add_argument('container_name')
+        parserLink.add_argument('cont_snap_name')
+        parserLink.add_argument('object_name')
+        parserLink.add_argument('obj_snap_name')
+
         # marker
+        parserMarker.add_argument('track_name')
+        parserMarker.add_argument('beat', type=int)
+        parserMarker.add_argument('tick', type=int, nargs='?')
+
         # play
+        parserMarker.add_argument('start_marker', nargs='?')
 
     def parseInput(self, argv=None):
         args = self.parser.parse_args(
-        ) if argv == None else self.parser.parse_args(argv)
+        ) if argv is None else self.parser.parse_args(argv)
 
         print(args)

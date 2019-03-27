@@ -1,7 +1,8 @@
 import pytest
 
 from music_tree.cli_parser import CliParser
-from music_tree.base.node import Tempo
+# from music_tree.base.node import Tempo
+
 
 def test_00_setup():
     assert 1 == 1
@@ -40,17 +41,18 @@ def mockProjectInput():
           ]),  # named text. Anonymous texts is not permitted
 
         # # link text and word
-        # (['link', 'intro', '3', 'word1', '1']), # link snap #3 of intro and snap #1 of word1
+        # (['link', 'intro', '3', 'word1', '1']),
+        # - link snap #3 of intro and snap #1 of word1
 
-        (['play']), # WARNING: no content in composition
-        # (['track', '--rename', 'track1', 'skeleton']), # edit parameters of tracks
-        # # - composition initialized with 8 (by default) tracks
+        (['play']),  # WARNING: no content in composition
+        # (['track', '--rename', 'track1', 'skeleton']), # edit parameters
+        # - composition initialized with 8 (by default) tracks
 
         # # markers
         # (['marker', '0', '0', 'begin']), # insert marker
         # (['marker', '4', '0', 'action']),
         # (['marker', '--list']), # list all named markers
-        # (['marker', '--all']), # list all snappoints including beats and other
+        # (['marker', '--all']), # list all snaps including beats and other
 
         # # link text and track
         # # "mt link track1 0 intro", # ERROR: no such track or text
