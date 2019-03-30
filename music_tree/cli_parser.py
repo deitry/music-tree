@@ -70,9 +70,14 @@ class CliParser():
         parserLink.add_argument('obj_snap_name')
 
         # marker
-        parserMarker.add_argument('track_name')
+        # parserMarker.add_argument('track_name')
+        # markerSubparsers = parserMarker.add_subparsers(
+        #     help='marker subcommands', dest='marker_command')
+        # markerListParser = markerSubparsers.add_parser("list")
+
         parserMarker.add_argument('beat', type=int)
-        parserMarker.add_argument('tick', type=int, nargs='?')
+        parserMarker.add_argument('tick', type=int)
+        parserMarker.add_argument('marker_name')
 
         # play
         parserMarker.add_argument('start_marker', nargs='?')

@@ -6,10 +6,15 @@ class Timecode():
         что события на "музыкальных" дорожках будут проецироваться на таймлайн
         с помощью точек привязки. """
 
-    def __init__(self):
-        self.beat = 0
-        self.tick = 0
-        pass
+    def __init__(self, beat=0, tick=0):
+        self.beat = int(beat)
+        self.tick = int(tick)
+
+    def __eq__(self, other):
+        """Overrides the default implementation"""
+        if isinstance(other, Timecode):
+            return self.beat == other.beat and self.tick == other.tick
+        return False
 
 
 class Snap():
