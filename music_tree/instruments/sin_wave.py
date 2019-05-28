@@ -5,28 +5,32 @@ import pyaudio
 
 
 class SinWave():
+
     def __init__(self, bitrate):
         self.bitrate = bitrate
 
-    def callback(self, in_data, frame_count, time_info, status):
-        print("thats mee")
+    def generate(self, how_many_bytes, freq, amplitude):
+        print("generate ", how_many_bytes, freq, amplitude)
 
-        # пока не работает генерация, создаём звук прямо здесь
         data = ''
-        MAX = 10
-        PERIOD = 100
+        for i in range(how_many_bytes):
+            data += chr(int(i % freq / freq * amplitude))
 
-        for i in range(frame_count):
-            data += chr(int(i % PERIOD / PERIOD * MAX))
+        return data
 
-        # TODO:
-        # data = self.yieldBytes(frame_count)
+    def generateSingleWave(self, freq, amplitude):
+        print("generate 1w", freq, amplitude)
 
-        flag = pyaudio.paContinue if len(data) > 0 else pyaudio.paComplete
-        print(len(data), flag)
+        data = ''
+        # TODO: возвращать не байты, а генератор?
+        samplesForFreq = self.bitrate / freq
+        for i in range(samplesForFreq):
+            arg = (i % samplesForFreq) / samplesForFreq
+            val = math.sin(math.pi * arg)
+            data += chr(int(val))
 
-        return (data, flag)
-
+        print("generate", len(data), data)
+        return data
 
     def toBytes(self, note, noteLen):
         """ Returns bytes representation of given note """
@@ -40,7 +44,7 @@ class SinWave():
 
         WAVEDATA = ''
 
-        MAX = 128  # по сути отвечает за громкость
+        MAX = 128 # по сути отвечает за громкость
         MAX_2 = int(MAX / 2)
 
         CENTER = MAX_2
@@ -49,24 +53,8 @@ class SinWave():
             WAVEDATA += chr(
                 int(
                     math.sin(x / ((self.bitrate / FREQUENCY) / math.pi)) *
-                    (MAX_2 - 1) + CENTER))
+                    (MAX_2 - 1) + CENTER
+                )
+            )
 
         return WAVEDATA
-
-    def makeWave(self, note, noteLen):
-        self.wave = self.toBytes(note, noteLen)
-
-    # сейчас использование ведёт к TypeError. TODO: научиться готовить генераторы
-    def yieldBytes(self, n):
-        print ("eee")
-        cnt = 0
-        data = bytes()
-
-        for i in range(len(self.wave)):
-
-            data += chr(int(self.wave[i]))
-            cnt += 1
-            if cnt >= n:
-                res = data
-                data = []
-                yield res
