@@ -21,6 +21,7 @@ class Voice():
         # TODO: генераторы вместо фиксированного буфера
 
         self.running = False
+        self.current = 0
 
     def start(self, pyaudio, bitrate):
         # запуск потока
@@ -46,13 +47,20 @@ class Voice():
         self._buffer = data
 
     def callback(self, in_data, frame_count, time_info, status):
-        flag = pa.paContinue if self.running else pa.paComplete
+        flag = pa.paContinue
+        # if self.running else pa.paComplete
         # complete только по прямому указанию остановиться
 
+        print("callback", frame_count, len(self._buffer))
+
         # циклически воспроизводим текущий звук
+        data = ''
         for i in range(frame_count):
-            data = self._buffer[i % len(self._buffer)]
             # FIXME: переделать на генератор?
+            data += self._buffer[self.current]
+            self.current += 1
+            if self.current >= len(self._buffer):
+                self.current = 0
 
         return (data, flag)
 
@@ -64,7 +72,7 @@ class Player():
         self.stopped = True
         self.last = datetime.now()
 
-        self.bitrate = 16000
+        self.bitrate = 44100
         self.p = pa.PyAudio()
         self.stream = None
 
@@ -87,7 +95,6 @@ class Player():
         #     note, noteLen = notes[i]
 
 
-        print(" IM GOING TO GENERERATE")
         waveData = [
             self.waveGen.toBytes(0, 1),  # generateSingleWave(440, 1),
             self.waveGen.toBytes(7, 2),  # generateSingleWave(659, 1),
@@ -101,7 +108,9 @@ class Player():
         for voice in self.voices:
             voice.start(self.p, self.bitrate)
 
-        time.sleep(3)
+        for i in range(3):
+            print("sleep", i)
+            time.sleep(1)
 
         # terminate streams
         for voice in self.voices:
