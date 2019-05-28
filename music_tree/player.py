@@ -51,8 +51,6 @@ class Voice():
         # if self.running else pa.paComplete
         # complete только по прямому указанию остановиться
 
-        print("callback", frame_count, len(self._buffer))
-
         # циклически воспроизводим текущий звук
         data = ''
         for i in range(frame_count):
@@ -96,9 +94,9 @@ class Player():
 
 
         waveData = [
-            self.waveGen.toBytes(0, 1),  # generateSingleWave(440, 1),
-            self.waveGen.toBytes(7, 2),  # generateSingleWave(659, 1),
-            self.waveGen.toBytes(10, 1),  # generateSingleWave(784, 0.7),
+            self.waveGen.toBytes(0, 1),
+            self.waveGen.toBytes(7, 2),
+            self.waveGen.toBytes(10, 1),
         ]
         for i in range(3):
             self.voices[i].setData(waveData[i])

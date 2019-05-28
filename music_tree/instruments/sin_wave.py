@@ -58,3 +58,10 @@ class SinWave():
             )
 
         return WAVEDATA
+
+    def rest(self):
+        """ Генерируем байты для паузы, чтобы не прерывать поток """
+
+        data = ''
+        for x in range(1024):
+            data+= chr(0)
