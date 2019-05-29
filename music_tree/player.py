@@ -79,7 +79,8 @@ class Player():
         # self.instruments = { "sin": SinWave(self.bitrate) }
         self.voices = []
 
-        for _ in range(3):
+        cnt = 6
+        for _ in range(cnt):
             self.voices.append(Voice())
 
     # NOTE: blockable, but works through non-blockable callback
@@ -93,18 +94,38 @@ class Player():
         #     note, noteLen = notes[i]
 
 
-        waveData = [
+        waveData1 = [
             self.waveGen.toBytes(0, 1),
+            self.waveGen.toBytes(4, 2),
             self.waveGen.toBytes(7, 2),
-            self.waveGen.toBytes(10, 1),
+            self.waveGen.toBytes(11, 1),
+            self.waveGen.toBytes(14, 2),
+            self.waveGen.toBytes(18, 2),
         ]
-        for i in range(3):
-            self.voices[i].setData(waveData[i])
+
+        waveData2 = [
+            self.waveGen.toBytes(1, 1),
+            self.waveGen.toBytes(5, 2),
+            self.waveGen.toBytes(8, 2),
+            self.waveGen.toBytes(12, 1),
+            self.waveGen.toBytes(15, 2),
+            self.waveGen.toBytes(19, 2),
+        ]
+
+        for i in range(len(self.voices)):
+            self.voices[i].setData(waveData1[i])
 
         self.stopped = False
 
         for voice in self.voices:
             voice.start(self.p, self.bitrate)
+
+        for i in range(3):
+            print("sleep", i)
+            time.sleep(1)
+
+        for i in range(len(self.voices)):
+            self.voices[i].setData(waveData2[i])
 
         for i in range(3):
             print("sleep", i)
