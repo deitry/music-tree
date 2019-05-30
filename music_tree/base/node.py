@@ -1,9 +1,26 @@
-""" Базовый класс для музыкальной ноды """
+""" Описания различных струкурных составляющих. """
+
+
+class Composition():
+
+    def __init_(self):
+        # TODO:
+        # - texts - собственно наполнение
+        # - controlText - специально выделенный текст с управляющими символами.
+        # Для бОльших игр с динамикой имеет смысл рассчитывать,
+        # что в управляющей дорожке будут не только одиночные символы
+        pass
 
 
 class Node():
+    """ Базовый класс для музыкальной ноды """
+
     def __init__(self):
         pass
+
+    def compose(self):
+        """ Соорудить из ноды и всех её детей нечто, что можно воспроизвести. """
+        return Composition()
 
 
 MAX_TICK = 32
@@ -11,18 +28,22 @@ MAX_TICK = 32
 
 class Timecode():
     def __init__(self, beat, tick):
-        self.beat = beat
-        self.tick = tick
 
-# пока я не придумал, какая между ними всеми должна быть взаимосвязь,
-# все накидаю в единый файлик
+        self.beat = max([beat, 0])
+        self.tick = min([
+            max([tick, 0]),
+            MAX_TICK
+        ])
 
 
-# ноты:
-# BEAT  TICK    VALUE
-# 0     0       0
-# 1     0       3
-# 1     16      7
+    def incTick(self, cnt):
+
+        # TODO: перенести из старого SM
+
+        self.tick += 1
+        if self.tick >= MAX_TICK:
+            self.tick = 0
+            self.beat += 1
 
 
 class Context():
@@ -46,7 +67,7 @@ class SingleText():
     def add(self, timecode, node):
         # NOTE: подразумеваем возможность размещать в данной точке любую ноду.
         # С учётом того, что в качестве ноды может выступать слово с ударением не на первой ноте,
-        # фактическое начало ноды может быть раньше.
+        # фактическое начало ноды может быть раньше - реализация слов
         self.notes[timecode] = node
 
     def concretize(self):
@@ -55,6 +76,9 @@ class SingleText():
 
 
 class Tempo():
+    # TODO: На подумать: как можно реализовать область переменного темпа?
+    # Например, плавное ускорение или рандомизацию
+
     def __init__(self, tempo):
         self.tempo = float(tempo)
 
