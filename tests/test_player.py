@@ -35,20 +35,14 @@ def test_04_nonBlockable():
 @pytest.mark.sound
 def test_05_nodes():
     player = Player()
+    main = Composition()
+    root = main.texts[0]
 
-    # node1 = Chord([0, 3, 7])
-    # node2 = Chord([0, 5, 8])
-    # node3 = Chord([0, 3, -5])
-
-    # tempo = Tempo(150)
-
-    root = SingleText()
-    root.add(Timecode(0, 0), 0)
-    root.add(Timecode(1, 0), 3)
-    root.add(Timecode(3, 0), 7)
+    root.add(Timecode(0, 0), [0, 7, 12])
+    root.add(Timecode(1, 0), [3, 10])
+    root.add(Timecode(3, 0), [0, 15])
+    # отдельным объектом обозначаем конец текста
     root.add(Timecode(5, 0), 0)
 
-    print("ok")
-    player.play(root)
-    print("good")
+    player.play(main)
     assert player.stopped

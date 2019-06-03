@@ -10,7 +10,7 @@ class SinWave():
         self.bitrate = bitrate
 
     def generate(self, how_many_bytes, freq, amplitude):
-        print("generate ", how_many_bytes, freq, amplitude)
+        # print("generate ", how_many_bytes, freq, amplitude)
 
         data = ''
         for i in range(how_many_bytes):
@@ -19,7 +19,7 @@ class SinWave():
         return data
 
     def generateSingleWave(self, freq, amplitude):
-        print("generate 1w", freq, amplitude)
+        # print("generate 1w", freq, amplitude)
 
         data = ''
         # TODO: возвращать не байты, а генератор?
@@ -29,16 +29,16 @@ class SinWave():
             val = math.sin(math.pi * arg)
             data += chr(int(val))
 
-        print("generate", len(data), data)
+        # print("generate", len(data), data)
         return data
 
-    def toBytes(self, note, noteLen):
+    def toBytes(self, note, noteLen=0):
         """ Returns bytes representation of given note """
 
-        noteHz = 440 * pow(2., note / 12.)
+        noteHz = 220 * pow(2., note / 12.)
 
         FREQUENCY = noteHz
-        LENGTH = noteLen
+        LENGTH = noteLen if noteLen > 0 else 1 / FREQUENCY
 
         NUMBEROFFRAMES = int(self.bitrate * LENGTH)
 
@@ -63,5 +63,7 @@ class SinWave():
         """ Генерируем байты для паузы, чтобы не прерывать поток """
 
         data = ''
-        for x in range(1024):
-            data+= chr(0)
+        for _ in range(24):
+            data += chr(0)
+
+        return data
