@@ -11,11 +11,13 @@ from music_tree.voice import Voice
 from music_tree.sound_pool import MAX_VOICES
 
 DEFAULT_BITRATE = 44100
+TIME_DEBUG = False
 
 
 class Player():
     def __init__(self, **kwargs):
         self._testMode = kwargs["test"] if "test" in kwargs else True
+        # FIXME: вместо testMode сделать отдельный MockPlayer
         self.stopped = True
         self.last = datetime.now()
 
@@ -47,19 +49,23 @@ class Player():
 
         VOICE_CNT = len(self.voices)
 
-        REST = self.waveGen.rest()
+        if not self._testMode:
+            REST = self.waveGen.rest()
+
         activeVoices = 0
 
         # Заблаговременно находим крайний элемент - когда останавливаться
         lastTimeCode = sorted(list(text.notes.keys()))[-1]
-        # print("END AT:", lastTimeCode)
+        if TIME_DEBUG: print("END AT:", lastTimeCode)
 
         # Запускаем голоса
         # TODO: В дальнейшем имеет смысл держать по пулу на каждый текст
         # TODO: запускать голоса имеет смысл, когда они на самом деле будут
         # использоваться. До этого можно держать их выключенными
-        for voice in self.voices:
-            voice.start(self.p, self.bitrate)
+
+        if not self._testMode:
+            for voice in self.voices:
+                voice.start(self.p, self.bitrate)
 
         prev = time.localtime()
 
@@ -76,7 +82,7 @@ class Player():
 
             CUR_CNT = len(currentNotes)
 
-            if CUR_CNT > 0:
+            if CUR_CNT > 0 and not self._testMode:
                 # - если есть - отправляем в потоки
                 # Если нот нет, полагаем, что ничего делать не надо
                 # TODO: начало пауз будет самостоятельным объектом
@@ -85,11 +91,11 @@ class Player():
                     if i >= VOICE_CNT:
                         break
 
-                    # print("before:", time.ctime())
+                    if TIME_DEBUG: print("before:", time.ctime())
                     waveData = self.waveGen.toBytes(currentNotes[i])
-                    # print("middle:", time.ctime())
+                    if TIME_DEBUG: print("middle:", time.ctime())
                     self.voices[i].setData(waveData)
-                    # print("after:", time.ctime())
+                    if TIME_DEBUG: print("after:", time.ctime())
 
                 # если в прошлый цикл активных голосов было больше, надо их занулить
                 if CUR_CNT < activeVoices:
@@ -100,13 +106,15 @@ class Player():
 
                 activeVoices = min(CUR_CNT, MAX_VOICES)
 
-            # DEBUG:
-            # new = time.localtime()
-            # print(delay, cursor, time.asctime(new), new.tm_sec - prev.tm_sec)
-            # prev = new
-
             # - sleep() согласно текущему темпу
-            time.sleep(delay)
+            if not self._testMode:
+                if TIME_DEBUG:
+                    new = time.localtime()
+                    print(delay, cursor, time.asctime(new), new.tm_sec - prev.tm_sec)
+                    prev = new
+
+                # в тестовом режиме не выдерживаем никаких пауз
+                time.sleep(delay)
 
             # - переходим на следующий шаг тика
             cursor.incTick()
@@ -116,8 +124,9 @@ class Player():
                 self.stopped = True
 
         # terminate streams
-        for voice in self.voices:
-            voice.stop()
+        if not self._testMode:
+            for voice in self.voices:
+                voice.stop()
 
         # FIXME: call in destructor
-        self.p.terminate()
+        if not self._testMode: self.p.terminate()

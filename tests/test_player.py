@@ -12,7 +12,7 @@ def test_00_setup():
 
 
 @pytest.mark.sound
-def test_04_nonBlockable():
+def test_01_nonBlockable():
     player = Player()
     main = Composition()
     root = main.texts[0]
@@ -25,7 +25,7 @@ def test_04_nonBlockable():
 
 
 @pytest.mark.sound
-def test_05_nodes():
+def test_02_nodes():
     player = Player()
     main = Composition()
     root = main.texts[0]
@@ -35,6 +35,18 @@ def test_05_nodes():
     root.add(Timecode(3, 0), [0, 15])
     # отдельным объектом обозначаем конец текста
     root.add(Timecode(5, 0), 0)
+
+    player.play(main)
+    assert player.stopped
+
+
+@pytest.mark.sound
+def test_03_empty():
+    player = Player()
+    main = Composition()
+    root = main.texts[0]
+
+    root.add(Timecode(10, 0), 0)
 
     player.play(main)
     assert player.stopped
