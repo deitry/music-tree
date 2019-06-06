@@ -54,3 +54,6 @@ class Timecode():
 
     def __hash__(self):
         return hash((self.beat, self.tick))
+
+    # TODO: операции сложения, вычитания и умножения
+    # Умножение может пригодится для 3*QUARTER, где QUARTER==Timecode(1,0)

@@ -1,6 +1,22 @@
 from music_tree.base.timecode import Timecode
 
 
+class Word():
+    def __init__(self, notes, strike=0, tempo=1):
+        self.notes = notes
+        self.strike = strike # нота, на которую попадает ударение
+        self.tempo = tempo # "разреженность" нот в слове
+
+    def getNote(self, cursor, startNote):
+        """ по параметрам слова пытаемся понять, должны ли мы что-то проигрывать """
+
+        # FIXME: в первом приближении решаем частные случаи
+        if self.strike == 0 and cursor == startNote and len(self.notes) > 0:
+            return self.notes[0]
+
+        return None
+
+
 class Text():
     """ Сопоставление таймкодов и нот/нод. """
 
@@ -16,7 +32,13 @@ class Text():
 
     def __init__(self):
         # NOTE: попробуем на основе дикта вместо списка пар таймкод-значение
+
+        # Для оптимизации дальнейшего поиска нод предлагается разбивать весь
+        # текст на строки, чтобы искать пересечения только по текущей строке
+        # и возможно смежным
+
         self.notes = dict()
+        self.nodes = dict()  # вместо отдельных нот - храним ноды
         self.last = Timecode(0, 0)
 
     def add(self, timecode, node):
@@ -24,6 +46,21 @@ class Text():
         # С учётом того, что в качестве ноды может выступать слово с ударением не на первой ноте,
         # фактическое начало ноды может быть раньше - реализация слов
         self.notes[timecode] = node
+
+    def getNotes(self, cursor):
+        # проходимся по всем (подлежит обдумыванию) нодам
+        # у каждой спрашиваем не желает ли она добавить ноту в данный момент
+
+        # FIXME; как правильно итерировать словарь с получением пары?
+        for startTime, node in self.nodes:
+            if all(isinstance(node, (int, list)), cursor == startTime):
+                return node
+
+            if isinstance(node, Word):
+                return node.getNote(node, cursor, startTime)
+
+
+        return None
 
     def concretize(self):
         """ Вовзращает словарь из нот - все ноды уже "развёрнуты" """

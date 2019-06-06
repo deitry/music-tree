@@ -75,6 +75,12 @@ class Player():
 
             # TODO: обработка "управляющих" символов
 
+            # TODO:
+            # for startTime, node in text.nodes
+            #   newNotes = getNote(node, cursor, startTime)
+            #   if newNotes:
+            #       currentNotes.append(newNotes')
+
             # for text in texts:
             if cursor in text.notes:
                 for note in text.notes[cursor]:
